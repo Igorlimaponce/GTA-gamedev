@@ -115,7 +115,7 @@ public static class GTAGameSetup
         // Verifica se já existe um collider de chão adequado (plano em y≈0).
         // Se não houver, cria um plano invisível para o player não cair pelo cenário.
         bool found = false;
-        foreach (var col in Object.FindObjectsByType<Collider>(FindObjectsSortMode.None))
+        foreach (var col in Object.FindObjectsByType<Collider>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
         {
             if (col is BoxCollider bc && bc.gameObject.name.Contains("Ground"))
             { found = true; break; }
@@ -232,7 +232,7 @@ public static class GTAGameSetup
         var canvas = FindOrCreateCanvas("HUDCanvas");
 
         // Painel de HUD com texto de dica.
-        var hintPanel = FindOrCreate(canvas, "HintPanel");
+        var hintPanel = FindOrCreate(canvas.gameObject, "HintPanel");
         var hintRect = GetOrAdd<RectTransform>(hintPanel);
         hintRect.anchorMin = new Vector2(0.5f, 0f);
         hintRect.anchorMax = new Vector2(0.5f, 0f);
@@ -245,7 +245,7 @@ public static class GTAGameSetup
         hintText.color = Color.white;
 
         // Painel de pausa.
-        var pausePanel = FindOrCreate(canvas, "PausePanel");
+        var pausePanel = FindOrCreate(canvas.gameObject, "PausePanel");
         var pauseRect = GetOrAdd<RectTransform>(pausePanel);
         pauseRect.anchorMin = Vector2.zero; pauseRect.anchorMax = Vector2.one;
         pauseRect.offsetMin = Vector2.zero; pauseRect.offsetMax = Vector2.zero;
