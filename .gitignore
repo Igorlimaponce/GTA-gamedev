@@ -1,0 +1,50 @@
+# ─────────────────────────────────────────
+#  Unity .gitignore  (Unity 6 / Built-in)
+# ─────────────────────────────────────────
+
+# Pastas geradas automaticamente pelo Unity (não versionadas)
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+[Uu]serSettings/
+[Bb]uild/
+[Bb]uilds/
+Assets/AssetStoreTools*
+
+# Arquivos de projeto do Visual Studio / Rider
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Compressão automática da Unity
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# JetBrains / Rider
+.idea/
+*.sln.DotSettings
+
+# Crash reports
+crashlytics-build.properties
