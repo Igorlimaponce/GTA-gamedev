@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace ProjetoGTA
 {
     /// <summary>
-    /// Controla os botões do menu principal e garante que a música toque.
+    /// Controla os botões do menu principal.
+    /// Fia os listeners em runtime para não depender de serialização do Editor.
     /// </summary>
     public class MainMenuController : MonoBehaviour
     {
@@ -14,8 +16,11 @@ namespace ProjetoGTA
             Cursor.visible = true;
             Time.timeScale = 1f;
 
-            // Se o MusicManager já existe (vindo do jogo), manda tocar.
             MusicManager.Instance?.Play();
+
+            // Fia botões pelo nome — funciona independente de como o setup criou o Canvas.
+            WireButton("BtnPlay", PlayGame);
+            WireButton("BtnQuit", QuitGame);
         }
 
         public void PlayGame()
@@ -30,6 +35,20 @@ namespace ProjetoGTA
 #else
             Application.Quit();
 #endif
+        }
+
+        private void WireButton(string buttonName, UnityEngine.Events.UnityAction action)
+        {
+            foreach (var btn in GetComponentsInChildren<Button>(true))
+            {
+                if (btn.name == buttonName)
+                {
+                    btn.onClick.RemoveAllListeners();
+                    btn.onClick.AddListener(action);
+                    return;
+                }
+            }
+            Debug.LogWarning($"[MainMenu] Botão '{buttonName}' não encontrado.");
         }
     }
 }
