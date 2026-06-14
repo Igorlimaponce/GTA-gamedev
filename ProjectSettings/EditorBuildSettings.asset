@@ -4,6 +4,12 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/_Projeto_GTA/Scenes/MainMenu.unity
+    guid: 544a797043374486a949f84b0724f26b
+  - enabled: 1
+    path: Assets/_Projeto_GTA/Scenes/GameScene.unity
+    guid: e3977fd22be5645a78d59f01d36a7e57
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 289c1b55c9541489481df5cc06664110, type: 3}
