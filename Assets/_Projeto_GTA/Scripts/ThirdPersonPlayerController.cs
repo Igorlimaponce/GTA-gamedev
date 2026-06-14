@@ -138,7 +138,9 @@ namespace ProjetoGTA
         private void UpdateAnimator(float planarSpeed)
         {
             if (_animator == null) return;
-            if (_hasSpeedParam) _animator.SetFloat(SpeedHash, planarSpeed);
+            // Speed normalizado 0-1: 0=parado, 0.5=caminhando, 1=correndo
+            float normalized = Mathf.Clamp01(planarSpeed / runSpeed);
+            if (_hasSpeedParam) _animator.SetFloat(SpeedHash, normalized, 0.1f, Time.fixedDeltaTime);
             if (_hasGroundedParam) _animator.SetBool(GroundedHash, _isGrounded);
         }
 
