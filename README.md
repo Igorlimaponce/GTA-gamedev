@@ -4,7 +4,7 @@
 
 ## Descrição
 
-**GTA 3D** é um jogo de mundo aberto em terceira pessoa desenvolvido em Unity 6 com pipeline Built-in. O jogador explora uma cidade low-poly, caminha pelas ruas e pode entrar em um carro para dirigir livremente pelo cenário. A câmera orbital segue o personagem ou o veículo, com controle suave pelo mouse.
+**GTA 3D** é um jogo de mundo aberto em terceira pessoa desenvolvido em Unity 6 com pipeline Built-in. O jogador explora uma cidade low-poly, caminha pelas ruas com animações de idle/corrida e pode entrar em um carro para dirigir livremente pelo cenário. A câmera orbital segue o personagem ou o veículo com controle suave pelo mouse, e o jogo conta com menu principal com música de fundo e sistema de pausa.
 
 ---
 
@@ -24,22 +24,23 @@
 
 ## Gameplay (Vídeo)
 
-<!-- Cole aqui o link do YouTube ou embed após gravar o vídeo -->
 > 🎬 **[Clique aqui para assistir ao gameplay no YouTube](SEU_LINK_AQUI)**
 
 ---
 
 ## Screenshots
 
-> **1 print do Menu Principal**
+**Menu Principal**
 
 ![Menu Principal](docs/screenshot_menu.png)
 
-> **2 prints do Jogo**
+**Personagem andando pela cidade**
 
-![Gameplay 1 — Personagem na cidade](docs/screenshot_gameplay1.png)
+![Gameplay — Personagem na cidade](docs/screenshot_gameplay1.png)
 
-![Gameplay 2 — Dirigindo o carro](docs/screenshot_gameplay2.png)
+**Dirigindo o carro**
+
+![Gameplay — Dirigindo o carro](docs/screenshot_gameplay2.png)
 
 ---
 
@@ -47,7 +48,7 @@
 
 ### 1. Movimento em 3ª Pessoa (`ThirdPersonPlayerController.cs`)
 
-O sistema de movimento usa um **Rigidbody** para física realista, com a direção calculada **em relação à câmera** — então "pra frente" é sempre para onde a câmera aponta, não o eixo global Z. Corrida com Shift e pulo com verificação de chão via `SphereCast`.
+O sistema de movimento usa um **Rigidbody** para física realista. A direção do movimento é calculada **em relação à câmera** — "frente" é sempre para onde a câmera aponta, não o eixo global Z. Corrida com Shift e pulo com verificação de chão via `SphereCast`. O personagem rotaciona suavemente para a direção do movimento usando `Quaternion.Slerp`.
 
 ```csharp
 // Direção relativa à câmera, projetada no plano horizontal.
@@ -75,13 +76,13 @@ if (moveDir.sqrMagnitude > 0.001f)
 }
 ```
 
-> 📸 *(insira aqui um print do personagem andando)*
+![Personagem andando pela cidade](docs/screenshot_gameplay1.png)
 
 ---
 
 ### 2. Entrar e Dirigir o Carro (`VehicleEnterExit.cs` + `CarController.cs`)
 
-Ao pressionar **E** perto do carro, o script detecta a distância, desativa o controle do personagem, parenteia o modelo dentro do veículo e transfere o controle da câmera para seguir o carro. Ao sair, o processo é invertido e o player é reposicionado ao lado do veículo.
+Ao pressionar **E** perto do carro, o script detecta a distância, desativa o controle do personagem, parenteia o modelo dentro do veículo e transfere o controle da câmera para seguir o carro. Ao sair, o processo é invertido e o player reaparece ao lado.
 
 ```csharp
 private void EnterCar()
@@ -104,14 +105,14 @@ private void EnterCar()
 }
 ```
 
-O `CarController` usa força via `Rigidbody.AddForce` para aceleração e rotação progressiva:
+O `CarController` usa `Rigidbody.AddForce` para aceleração e esterçamento progressivo sem WheelColliders — mais estável para um jogo arcade:
 
 ```csharp
 // Aceleração na direção frontal do carro.
 if (Mathf.Abs(currentSpeed) < maxSpeed)
     _rb.AddForce(transform.forward * accelInput * acceleration, ForceMode.Acceleration);
 
-// Esterçamento proporcional à velocidade (sem WheelColliders — mais estável).
+// Esterçamento proporcional à velocidade.
 if (Mathf.Abs(currentSpeed) > 0.5f)
 {
     float sign = Mathf.Sign(currentSpeed);
@@ -120,18 +121,47 @@ if (Mathf.Abs(currentSpeed) > 0.5f)
 }
 ```
 
-> 📸 *(insira aqui um print do personagem dentro do carro)*
+![Dirigindo o carro](docs/screenshot_gameplay2.png)
+
+---
+
+### 3. Sistema de Animações com Blend Tree (`GTAAnimationSetup.cs`)
+
+O personagem utiliza animações **Humanoid** do Mixamo (Idle, Walking, Running) controladas por um **Animator Controller** gerado via script. Um Blend Tree 1D interpola suavemente entre as três animações com base no parâmetro `Speed` (0 = parado · 0.5 = andando · 1 = correndo). O valor de Speed vem da velocidade real do Rigidbody, garantindo que a animação responda corretamente em todas as direções.
+
+```csharp
+// Criação do Blend Tree via Editor script (GTAAnimationSetup.cs)
+BlendTree blendTree;
+AnimatorState locomotionState = ctrl.CreateBlendTreeInController("Locomotion", out blendTree);
+blendTree.blendType      = BlendTreeType.Simple1D;
+blendTree.blendParameter = "Speed";
+blendTree.useAutomaticThresholds = false;
+
+blendTree.AddChild(idle, 0.00f);  // parado
+blendTree.AddChild(walk, 0.50f);  // caminhando
+blendTree.AddChild(run,  1.00f);  // correndo
+```
+
+```csharp
+// No ThirdPersonPlayerController.cs — Speed calculado da velocidade real do Rigidbody
+float planar = new Vector3(_rb.linearVelocity.x, 0f, _rb.linearVelocity.z).magnitude;
+float normalized = Mathf.Clamp01(planar / runSpeed);
+// Suavização com dampTime de 0.08s para transições fluidas
+_animator.SetFloat(SpeedHash, normalized, 0.08f, Time.fixedDeltaTime);
+```
+
+![Personagem com animação de corrida](docs/screenshot_gameplay1.png)
 
 ---
 
 ## Como Rodar
 
 1. Abra o projeto no **Unity 6** (`6000.4.11f1` ou superior).
-2. No menu do Unity: **GTA → Setup Completo** (executa uma vez).
-3. Abra a cena `Assets/_Projeto_GTA/Scenes/MainMenu.unity`.
-4. Pressione **Play**.
+2. Importe animações do Mixamo (Idle, Walking, Running — FBX for Unity) em `Assets/_Projeto_GTA/Animations/`.
+3. No menu do Unity: **GTA → ★ Rodar Tudo** (configura cenas, player, câmera, carro e animações).
+4. Pressione **▶ Play**.
 
-> **Requisito:** o repositório não inclui a pasta `Library/` (gerada automaticamente). Na primeira abertura, o Unity importará os assets — aguarde a compilação.
+> **Requisito:** o repositório não inclui a pasta `Library/` (gerada automaticamente pelo Unity na primeira abertura).
 
 ---
 
@@ -142,7 +172,8 @@ if (Mathf.Abs(currentSpeed) > 0.5f)
 | Cartoon City Free (ithappy) | Unity Asset Store | Free |
 | Drivable-Free Low Poly Cars | Unity Asset Store | Free |
 | POLYGON - Starter Pack (Synty) | Unity Asset Store | Free |
-| Trilha sonora | Gerada via síntese (Python) | Royalty-free |
+| Animações de personagem | Mixamo (Adobe) | Free |
+| Trilha sonora | Gerada via síntese Python | Royalty-free |
 
 ---
 
