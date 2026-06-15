@@ -132,15 +132,16 @@ namespace ProjetoGTA
                 _jumpQueued = false;
             }
 
-            UpdateAnimator(moveDir.magnitude * targetSpeed);
+            UpdateAnimator();
         }
 
-        private void UpdateAnimator(float planarSpeed)
+        private void UpdateAnimator()
         {
             if (_animator == null) return;
-            // Speed normalizado 0-1: 0=parado, 0.5=caminhando, 1=correndo
-            float normalized = Mathf.Clamp01(planarSpeed / runSpeed);
-            if (_hasSpeedParam) _animator.SetFloat(SpeedHash, normalized, 0.1f, Time.fixedDeltaTime);
+            // Usa velocidade real do Rigidbody: não congela ao virar de direção
+            float planar = new Vector3(_rb.linearVelocity.x, 0f, _rb.linearVelocity.z).magnitude;
+            float normalized = Mathf.Clamp01(planar / runSpeed);
+            if (_hasSpeedParam) _animator.SetFloat(SpeedHash, normalized, 0.08f, Time.fixedDeltaTime);
             if (_hasGroundedParam) _animator.SetBool(GroundedHash, _isGrounded);
         }
 

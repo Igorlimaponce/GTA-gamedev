@@ -29,6 +29,13 @@ public static class GTAGameSetup
     // Áudio
     private const string MusicPath = "Assets/_Projeto_GTA/Audio/menu_music.wav";
 
+    [MenuItem("GTA/★ Rodar Tudo (Setup + Animações)", priority = 0)]
+    public static void RunEverything()
+    {
+        RunFullSetup();
+        GTAAnimationSetup.SetupAnimations();
+    }
+
     [MenuItem("GTA/Setup Completo", priority = 1)]
     public static void RunFullSetup()
     {
@@ -135,9 +142,15 @@ public static class GTAGameSetup
 
     private static GameObject SetupPlayer()
     {
-        // Remove player anterior se existir.
-        var old = GameObject.FindWithTag("Player");
-        if (old != null) Object.DestroyImmediate(old);
+        // Remove TODOS os Players existentes (por tag e por nome) — evita duplicatas.
+        foreach (var go in Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (go == null) continue;
+            bool isPlayer = false;
+            try { isPlayer = go.CompareTag("Player"); } catch { /* tag não registrada */ }
+            if (isPlayer || go.name == "Player")
+                Object.DestroyImmediate(go);
+        }
 
         // Tenta carregar o prefab Synty.
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
