@@ -177,6 +177,17 @@ _animator.SetFloat(SpeedHash, normalized, 0.08f, Time.fixedDeltaTime);
 
 ---
 
+## Observação sobre Áudio
+
+> ⚠️ **A música de fundo não aparece nas gravações de tela**, pois o software de captura não capturou o áudio interno do Unity durante a gravação do gameplay.
+>
+> O arquivo de áudio **existe no projeto** e toca normalmente ao jogar localmente:
+> `Assets/_Projeto_GTA/Audio/menu_music.wav`
+>
+> Para ouvir: abra o projeto no Unity, rode **GTA → ★ Rodar Tudo** e pressione Play — a música inicia automaticamente no menu.
+
+---
+
 ## Autor
 
-**Igor Lima Ponce** · hiomalima@gmail.com
+**Igor Lima Ponce**
