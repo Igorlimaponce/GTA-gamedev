@@ -24,7 +24,7 @@
 
 ## Gameplay (Vídeo)
 
-> 🎬 **[Clique aqui para assistir ao gameplay no YouTube](SEU_LINK_AQUI)**
+> 🎬 **[Clique aqui para assistir ao gameplay (Google Drive)](https://drive.google.com/file/d/1XlgPaYO9wEOuRvmkG0lH4xhU0Cbmhk1C/view?usp=share_link)**
 
 ---
 
