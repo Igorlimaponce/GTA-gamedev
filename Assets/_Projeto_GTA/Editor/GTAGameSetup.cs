@@ -32,8 +32,27 @@ public static class GTAGameSetup
     [MenuItem("GTA/★ Rodar Tudo (Setup + Animações)", priority = 0)]
     public static void RunEverything()
     {
+        // 1. Monta GameScene + MainMenu + Build Settings
         RunFullSetup();
+
+        // 2. RunFullSetup termina com MainMenu ativa (sem Player).
+        //    Reabre GameScene para que SetupAnimations encontre o Player.
+        EditorSceneManager.OpenScene(GameScenePath, OpenSceneMode.Single);
+
+        // 3. Aplica Animator Controller ao Player (se clips do Mixamo já importados)
         GTAAnimationSetup.SetupAnimations();
+
+        // 4. Deixa MainMenu aberta — pronta para dar Play
+        EditorSceneManager.OpenScene(MenuScenePath, OpenSceneMode.Single);
+
+        EditorUtility.DisplayDialog("GTA — Pronto!",
+            "✅ Setup completo!\n\n" +
+            "Pressione ▶ Play para jogar.\n\n" +
+            "Controles:\n" +
+            "  WASD – mover   |  Mouse – câmera\n" +
+            "  Shift – correr  |  Espaço – pular\n" +
+            "  E – entrar/sair do carro\n" +
+            "  Esc – pausar   |  F12 – screenshot", "Jogar!");
     }
 
     [MenuItem("GTA/Setup Completo", priority = 1)]
